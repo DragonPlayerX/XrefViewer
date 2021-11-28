@@ -36,8 +36,9 @@ namespace XrefViewer
         {
             if (e.KeyChar == (char)Keys.Return)
             {
-                CommandHandler.ParseAndExecute(InputTextBox.Text);
+                string command = InputTextBox.Text;
                 InputTextBox.Text = "";
+                CommandHandler.ParseAndExecute(command);
             }
         }
     }
