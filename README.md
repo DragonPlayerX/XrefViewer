@@ -21,9 +21,9 @@ This mod utilizes the Xref scanning methods from [Il2CppAssemblyUnhollower](http
 | Command | Description | Arguments | Argument Description
 |-|-|-|-|
 |xref|Scan a method or a type|-t typename<br>-m methodname<br>-s<br>-c<br>-l|-t Defines the type<br>-m Defines the method from the type<br>-s Print only strings of the method<br>-c Use methodname as part of name<br>-l Allow large scan results
-|dump|Writes current console contents to a file|-f filepath|-f Defines the destination file
+|dump|Writes console to file|-f filepath|-f Defines the destination file
 |clear|Clears the console window|
-|help|Print all commands and their description
+|help|Prints all commands
 
 ### Screenshot
 
