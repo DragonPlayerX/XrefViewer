@@ -139,6 +139,7 @@ namespace XrefViewer.Core
             {
                 if (instance.Type == XrefType.Global)
                     Window.WriteLine(Color.White, "String: " + instance.ReadAsObject().ToString());
+                Application.DoEvents();
             }
         }
 
