@@ -29,11 +29,12 @@ namespace XrefViewer
             CommandHandler.RegisterCommand("help", new Action<CommandHandler.ArgumentData[]>(args =>
             {
                 ViewerWindow.WriteLine(Color.White, "Use command 'xref <args>' to scan a method or a whole type.");
-                ViewerWindow.WriteLine(Color.White, "Exact usage: xref [-t typename] [-m methodname] [-s] [-c]");
+                ViewerWindow.WriteLine(Color.White, "Exact usage: xref [-t typename] [-m methodname] [-s] [-c] [-l]");
                 ViewerWindow.WriteLine(Color.White, "    -t  Defines the type.");
                 ViewerWindow.WriteLine(Color.White, "    -m  Defines the method from the type.");
                 ViewerWindow.WriteLine(Color.White, "    -s  Print strings of the method or of all methods from the given type.");
-                ViewerWindow.WriteLine(Color.White, "    -c  Method name will be used as part of name instead of exact name");
+                ViewerWindow.WriteLine(Color.White, "    -c  Method name will be used as part of name instead of exact name.");
+                ViewerWindow.WriteLine(Color.White, "    -l  Allow large scan results.");
                 ViewerWindow.WriteLine(Color.White, "");
                 ViewerWindow.WriteLine(Color.White, "Use command 'clear' to clear the console.");
                 ViewerWindow.WriteLine(Color.White, "Exact usage: clear");
@@ -51,6 +52,7 @@ namespace XrefViewer
                 string methodName = null;
                 bool printStrings = false;
                 bool exactName = true;
+                bool largeScans = false;
 
                 foreach (CommandHandler.ArgumentData arg in args)
                 {
@@ -68,10 +70,13 @@ namespace XrefViewer
                         case "-c":
                             exactName = false;
                             break;
+                        case "-l":
+                            largeScans = true;
+                            break;
                     }
                 }
 
-                XrefCore.Scan(typeName, methodName, printStrings, exactName);
+                XrefCore.Scan(typeName, methodName, printStrings, exactName, largeScans);
             }));
 
             CommandHandler.RegisterCommand("dump", new Action<CommandHandler.ArgumentData[]>(args =>

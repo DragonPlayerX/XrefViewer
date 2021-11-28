@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using UnhollowerRuntimeLib.XrefScans;
@@ -13,7 +14,7 @@ namespace XrefViewer.Core
 
         private static readonly List<Type> BlacklistedTypes = new List<Type>() { typeof(Il2CppSystem.Object), typeof(object) };
 
-        public static void Scan(string typeName, string methodName, bool printStrings, bool exactName)
+        public static void Scan(string typeName, string methodName, bool printStrings, bool exactName, bool largeScans)
         {
             if (typeName == null)
             {
@@ -42,7 +43,7 @@ namespace XrefViewer.Core
             {
                 if (exactName)
                 {
-                    DumpMethod(type.GetMethod(methodName), printStrings);
+                    DumpMethod(type.GetMethod(methodName), printStrings, largeScans);
                 }
                 else
                 {
@@ -53,7 +54,7 @@ namespace XrefViewer.Core
                         foreach (MethodInfo method in methods)
                         {
                             if (method.Name.Contains(methodName))
-                                DumpMethod(method, printStrings);
+                                DumpMethod(method, printStrings, largeScans);
                         }
                     }
                     catch (Exception e)
@@ -71,7 +72,7 @@ namespace XrefViewer.Core
                     foreach (MethodInfo method in methods)
                     {
                         if (!BlacklistedTypes.Contains(method.DeclaringType))
-                            DumpMethod(method, printStrings);
+                            DumpMethod(method, printStrings, largeScans);
                     }
                 }
                 catch (Exception e)
@@ -81,7 +82,7 @@ namespace XrefViewer.Core
             }
         }
 
-        private static void DumpMethod(MethodInfo method, bool printStrings)
+        private static void DumpMethod(MethodInfo method, bool printStrings, bool largeScans)
         {
             try
             {
@@ -96,15 +97,27 @@ namespace XrefViewer.Core
                 if (printStrings)
                 {
                     Window.WriteLine(Color.LightGreen, "Method strings: ");
-                    DumpXrefMethodString(XrefScanner.XrefScan(method));
+                    XrefInstance[] result = XrefScanner.XrefScan(method).ToArray();
+                    if (result.Length > 100 && !largeScans)
+                        Window.WriteLine(Color.Yellow, "Unable to dump information because it exceeded the length limit. Bypass with adding -l argument.");
+                    else
+                        DumpXrefMethodString(result);
                 }
                 else
                 {
                     Window.WriteLine(Color.LightGreen, "Method is using: ");
-                    DumpXrefMethod(XrefScanner.XrefScan(method));
+                    XrefInstance[] usingResult = XrefScanner.XrefScan(method).ToArray();
+                    if (usingResult.Length > 100 && !largeScans)
+                        Window.WriteLine(Color.Yellow, "Unable to dump information because it exceeded the length limit. Bypass with adding -l argument.");
+                    else
+                        DumpXrefMethod(usingResult);
 
                     Window.WriteLine(Color.LightGreen, "Method is used by:");
-                    DumpXrefMethod(XrefScanner.UsedBy(method));
+                    XrefInstance[] usedByResult = XrefScanner.UsedBy(method).ToArray();
+                    if (usedByResult.Length > 100 && !largeScans)
+                        Window.WriteLine(Color.Yellow, "Unable to dump information because it exceeded the length limit. Bypass with adding -l argument.");
+                    else
+                        DumpXrefMethod(usedByResult);
                 }
             }
             catch (Exception)
