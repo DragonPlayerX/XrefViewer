@@ -8,6 +8,8 @@ namespace XrefViewer
 {
     public partial class XrefViewerWindow : Form
     {
+        public string ConsoleText => ConsoleTextBox.Text;
+
         public XrefViewerWindow()
         {
             InitializeComponent();

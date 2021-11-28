@@ -11,7 +11,9 @@ namespace XrefViewer.Core
     {
         private static XrefViewerWindow Window => XrefViewerMod.Instance.ViewerWindow;
 
-        public static void Scan(string typeName, string methodName, bool printStrings)
+        private static readonly List<Type> BlacklistedTypes = new List<Type>() { typeof(Il2CppSystem.Object), typeof(object) };
+
+        public static void Scan(string typeName, string methodName, bool printStrings, bool exactName)
         {
             if (typeName == null)
             {
@@ -38,7 +40,27 @@ namespace XrefViewer.Core
 
             if (methodName != null)
             {
-                DumpMethod(type.GetMethod(methodName), printStrings);
+                if (exactName)
+                {
+                    DumpMethod(type.GetMethod(methodName), printStrings);
+                }
+                else
+                {
+                    try
+                    {
+                        MethodInfo[] methods = type.GetMethods();
+
+                        foreach (MethodInfo method in methods)
+                        {
+                            if (method.Name.Contains(methodName))
+                                DumpMethod(method, printStrings);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Window.WriteLine(Color.Red, "An error occurred: " + e.ToString());
+                    }
+                }
             }
             else
             {
@@ -48,7 +70,7 @@ namespace XrefViewer.Core
 
                     foreach (MethodInfo method in methods)
                     {
-                        if (method.DeclaringType != typeof(Il2CppSystem.Object) && method.DeclaringType != typeof(object))
+                        if (!BlacklistedTypes.Contains(method.DeclaringType))
                             DumpMethod(method, printStrings);
                     }
                 }

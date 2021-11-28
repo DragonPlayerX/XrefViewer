@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
@@ -28,13 +29,18 @@ namespace XrefViewer
             CommandHandler.RegisterCommand("help", new Action<CommandHandler.ArgumentData[]>(args =>
             {
                 ViewerWindow.WriteLine(Color.White, "Use command 'xref <args>' to scan a method or a whole type.");
-                ViewerWindow.WriteLine(Color.White, "Exact usage: xref [-t typename] [-m methodname] [-s]");
+                ViewerWindow.WriteLine(Color.White, "Exact usage: xref [-t typename] [-m methodname] [-s] [-c]");
                 ViewerWindow.WriteLine(Color.White, "    -t  Defines the type.");
                 ViewerWindow.WriteLine(Color.White, "    -m  Defines the method from the type.");
                 ViewerWindow.WriteLine(Color.White, "    -s  Print strings of the method or of all methods from the given type.");
+                ViewerWindow.WriteLine(Color.White, "    -c  Method name will be used as part of name instead of exact name");
                 ViewerWindow.WriteLine(Color.White, "");
                 ViewerWindow.WriteLine(Color.White, "Use command 'clear' to clear the console.");
                 ViewerWindow.WriteLine(Color.White, "Exact usage: clear");
+                ViewerWindow.WriteLine(Color.White, "");
+                ViewerWindow.WriteLine(Color.White, "Use command 'dump <args>' to write the current console output to a file.");
+                ViewerWindow.WriteLine(Color.White, "Exact usage: dump [-f filepath]");
+                ViewerWindow.WriteLine(Color.White, "    -f  Defines the destination file.");
             }));
 
             CommandHandler.RegisterCommand("clear", new Action<CommandHandler.ArgumentData[]>(args => ViewerWindow.ClearConsole()));
@@ -44,6 +50,7 @@ namespace XrefViewer
                 string typeName = null;
                 string methodName = null;
                 bool printStrings = false;
+                bool exactName = true;
 
                 foreach (CommandHandler.ArgumentData arg in args)
                 {
@@ -58,10 +65,34 @@ namespace XrefViewer
                         case "-s":
                             printStrings = true;
                             break;
+                        case "-c":
+                            exactName = false;
+                            break;
                     }
                 }
 
-                XrefCore.Scan(typeName, methodName, printStrings);
+                XrefCore.Scan(typeName, methodName, printStrings, exactName);
+            }));
+
+            CommandHandler.RegisterCommand("dump", new Action<CommandHandler.ArgumentData[]>(args =>
+            {
+                string filePath = null;
+
+                foreach (CommandHandler.ArgumentData arg in args)
+                {
+                    switch (arg.Identifier.ToLower())
+                    {
+                        case "-f":
+                            filePath = arg.Content;
+                            break;
+                    }
+                }
+
+                if (filePath == null)
+                    filePath = "xref-dump_" + DateTime.Now.ToString("dd.MM.yyyy_HH_mm_ss.fff") + ".txt";
+
+                File.WriteAllText(filePath, ViewerWindow.ConsoleText);
+                ViewerWindow.WriteLine(Color.LimeGreen, "Successfully written console content to " + filePath);
             }));
 
             Application.EnableVisualStyles();
