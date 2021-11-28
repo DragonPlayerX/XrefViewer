@@ -70,6 +70,7 @@ namespace XrefViewer
             {
                 ViewerWindow = new XrefViewerWindow();
                 ViewerWindow.Show();
+                CommandHandler.ParseAndExecute("help");
                 Application.Run();
             });
             thread.SetApartmentState(ApartmentState.STA);
