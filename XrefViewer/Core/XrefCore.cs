@@ -51,11 +51,18 @@ namespace XrefViewer.Core
                     {
                         MethodInfo[] methods = type.GetMethods();
 
+                        bool foundMethod = false;
                         foreach (MethodInfo method in methods)
                         {
                             if (method.Name.Contains(methodName))
+                            {
                                 DumpMethod(method, printStrings, largeScans);
+                                foundMethod = true;
+                            }
                         }
+
+                        if (!foundMethod)
+                            Window.WriteLine(Color.Red, "ERROR: Method not found");
                     }
                     catch (Exception e)
                     {
