@@ -19,7 +19,7 @@
 			<HintPath>..\Libs\Il2CppSystem.Core.dll</HintPath>
 		</Reference>
 		<Reference Include="MelonLoader">
-			<HintPath>..\..\..\GitHub\VRCFaceTracking\Libs\MelonLoader.dll</HintPath>
+			<HintPath>..\Libs\MelonLoader.dll</HintPath>
 		</Reference>
 		<Reference Include="UnhollowerBaseLib">
 			<HintPath>..\Libs\UnhollowerBaseLib.dll</HintPath>
