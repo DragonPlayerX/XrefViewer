@@ -8,14 +8,14 @@ using MelonLoader;
 using XrefViewer;
 using XrefViewer.Core;
 
-[assembly: MelonInfo(typeof(XrefViewerMod), "XrefViewer", "1.0.0", "DragonPlayer", "https://github.com/DragonPlayerX/XrefViewer")]
+[assembly: MelonInfo(typeof(XrefViewerMod), "XrefViewer", "1.0.1", "DragonPlayer", "https://github.com/DragonPlayerX/XrefViewer")]
 [assembly: MelonGame]
 
 namespace XrefViewer
 {
     public class XrefViewerMod : MelonMod
     {
-        public static readonly string Version = "1.0.0";
+        public static readonly string Version = "1.0.1";
 
         public static XrefViewerMod Instance { get; private set; }
 
