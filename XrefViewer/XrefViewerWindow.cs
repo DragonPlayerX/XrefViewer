@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -8,7 +9,12 @@ namespace XrefViewer
 {
     public partial class XrefViewerWindow : Form
     {
+        public static readonly int HistorySize = 256;
+
         public string ConsoleText => ConsoleTextBox.Text;
+
+        private List<string> commandHistory = new List<string>() { "" };
+        private int historyIndex;
 
         public XrefViewerWindow()
         {
@@ -32,13 +38,37 @@ namespace XrefViewer
             ConsoleTextBox.Clear();
         }
 
-        private void InputTextBox_KeyPress(object sender, KeyPressEventArgs e)
+        private void InputTextBox_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyChar == (char)Keys.Return)
+            if (e.KeyCode == Keys.Return)
             {
+                historyIndex = 0;
                 string command = InputTextBox.Text;
                 InputTextBox.Text = "";
+
+                commandHistory.Insert(1, command);
+                if (commandHistory.Count > HistorySize + 1)
+                    commandHistory.RemoveAt(commandHistory.Count - 1);
+
                 CommandHandler.ParseAndExecute(command);
+            }
+            else if (e.KeyCode == Keys.Up)
+            {
+                if (historyIndex < commandHistory.Count - 1)
+                    historyIndex++;
+
+                InputTextBox.Text = commandHistory[historyIndex];
+                InputTextBox.SelectionStart = InputTextBox.Text.Length;
+                InputTextBox.SelectionLength = 0;
+            }
+            else if (e.KeyCode == Keys.Down)
+            {
+                if (historyIndex > 0)
+                    historyIndex--;
+
+                InputTextBox.Text = commandHistory[historyIndex];
+                InputTextBox.SelectionStart = InputTextBox.Text.Length;
+                InputTextBox.SelectionLength = 0;
             }
         }
     }
