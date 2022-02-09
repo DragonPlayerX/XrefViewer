@@ -99,7 +99,10 @@ namespace XrefViewer.Core
                     return;
                 }
 
-                Window.WriteLine(Color.Yellow, "Scanning " + method.Name + "...");
+                Window.Write(Color.Yellow, "Scanning ");
+                Window.Write(Color.DarkGray, method.DeclaringType.FullName + "#");
+                Window.Write(Color.Aqua, method.Name);
+                Window.Write(Color.Yellow, " =>\n");
 
                 if (printStrings)
                 {

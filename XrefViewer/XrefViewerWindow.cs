@@ -21,21 +21,46 @@ namespace XrefViewer
             InitializeComponent();
         }
 
-        public void WriteLine(Color color, string message)
+        public void WriteLine(Color color, string message) => Write(color, message + Environment.NewLine);
+
+        public void Write(Color color, string message)
         {
             ConsoleTextBox.SuspendLayout();
             ConsoleTextBox.SelectionStart = ConsoleTextBox.TextLength;
             ConsoleTextBox.SelectionLength = 0;
             ConsoleTextBox.SelectionColor = color;
-            ConsoleTextBox.AppendText(message + Environment.NewLine);
+            ConsoleTextBox.AppendText(message);
             ConsoleTextBox.SelectionColor = ConsoleTextBox.ForeColor;
             ConsoleTextBox.ScrollToCaret();
             ConsoleTextBox.ResumeLayout();
         }
 
-        public void ClearConsole()
+        public void ClearConsole() => ConsoleTextBox.Clear();
+
+        private void ConsoleTextBox_MouseClick(object sender, MouseEventArgs e)
         {
-            ConsoleTextBox.Clear();
+            if (ConsoleTextBox.SelectionColor == Color.Aqua || ConsoleTextBox.SelectionColor == Color.DarkGray)
+            {
+                ConsoleTextBox.SelectionLength = 0;
+
+                while (ConsoleTextBox.SelectionColor == Color.Aqua || ConsoleTextBox.SelectionColor == Color.DarkGray)
+                    ConsoleTextBox.SelectionStart--;
+
+                int startIndex = ConsoleTextBox.SelectionStart;
+                ConsoleTextBox.SelectionStart++;
+
+                while (ConsoleTextBox.SelectionColor == Color.Aqua || ConsoleTextBox.SelectionColor == Color.DarkGray)
+                    ConsoleTextBox.SelectionStart++;
+
+                ConsoleTextBox.SelectionStart--;
+                int endIndex = ConsoleTextBox.SelectionStart;
+
+                ConsoleTextBox.SelectionStart = startIndex;
+                ConsoleTextBox.SelectionLength = endIndex - startIndex;
+
+                string[] data = ConsoleTextBox.Text.Substring(startIndex, endIndex - startIndex).Split('#');
+                InputTextBox.Text = "xref -t " + data[0] + " -m " + data[1];
+            }
         }
 
         private void InputTextBox_KeyDown(object sender, KeyEventArgs e)

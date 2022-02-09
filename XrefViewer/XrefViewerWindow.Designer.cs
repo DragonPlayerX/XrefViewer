@@ -66,6 +66,7 @@ namespace XrefViewer
             this.ConsoleTextBox.Size = new System.Drawing.Size(984, 532);
             this.ConsoleTextBox.TabIndex = 0;
             this.ConsoleTextBox.Text = "";
+            this.ConsoleTextBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.ConsoleTextBox_MouseClick);
             // 
             // Container
             // 
@@ -95,7 +96,7 @@ namespace XrefViewer
 
         #endregion
         private System.Windows.Forms.TextBox InputTextBox;
-        private System.Windows.Forms.RichTextBox ConsoleTextBox;
         private System.Windows.Forms.Panel Container;
+        private System.Windows.Forms.RichTextBox ConsoleTextBox;
     }
 }
