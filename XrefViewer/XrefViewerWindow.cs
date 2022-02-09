@@ -67,6 +67,9 @@ namespace XrefViewer
         {
             if (e.KeyCode == Keys.Return)
             {
+                if (string.IsNullOrEmpty(InputTextBox.Text) || string.IsNullOrWhiteSpace(InputTextBox.Text))
+                    return;
+
                 historyIndex = 0;
                 string command = InputTextBox.Text;
                 InputTextBox.Text = "";
