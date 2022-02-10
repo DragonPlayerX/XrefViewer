@@ -25,7 +25,6 @@ namespace XrefViewer
         {
             Instance = this;
             MelonLogger.Msg("Initializing XrefViewer " + Version + "...");
-
             CommandHandler.RegisterCommand("help", new Action<CommandHandler.ArgumentData[]>(args =>
             {
                 ViewerWindow.WriteLine(Color.White, "Use command 'xref <args>' to scan a method or a whole type.");
@@ -105,9 +104,24 @@ namespace XrefViewer
             Thread thread = new Thread(() =>
             {
                 ViewerWindow = new XrefViewerWindow();
-                ViewerWindow.Show();
                 CommandHandler.ParseAndExecute("help");
-                Application.Run();
+                Application.ThreadException += new ThreadExceptionEventHandler((sender, e) =>
+                {
+                    DialogResult result = MessageBox.Show("Restart the WinForms Application Thread?", "Fatal WinForms Error", MessageBoxButtons.YesNo, MessageBoxIcon.Stop);
+                    if (result == DialogResult.Yes)
+                    {
+                        ViewerWindow.Dispose();
+                        Application.ExitThread();
+                        ViewerWindow = new XrefViewerWindow();
+                        CommandHandler.ParseAndExecute("help");
+                        Application.Run(ViewerWindow);
+                    }
+                    else
+                    {
+                        Application.Exit();
+                    }
+                });
+                Application.Run(ViewerWindow);
             });
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start();
