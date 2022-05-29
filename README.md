@@ -12,6 +12,7 @@ This mod utilizes xref scanning methods from [Il2CppAssemblyUnhollower](https://
 
 ## Example Video
 
+https://user-images.githubusercontent.com/73474149/170877201-083d3a48-6303-462a-a14f-1da97bfd586d.mp4
 
 ## Credits
 
