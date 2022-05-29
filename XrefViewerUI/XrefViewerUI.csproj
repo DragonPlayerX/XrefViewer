@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net4.7.2-windows</TargetFramework>
+		<UseWPF>true</UseWPF>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="AdonisUI" Version="1.17.1" />
+		<PackageReference Include="AdonisUI.ClassicTheme" Version="1.17.1" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="MVVM\View\" />
+	</ItemGroup>
+
+	<Target Name="PostBuildDebug" AfterTargets="Build" Condition="'$(Configuration)'=='Debug'">
+		<Exec Command="copy bin\Debug\net4.7.2-windows\XrefViewerUI.exe ..\XrefViewer\Resources" />
+		<Exec Command="copy bin\Debug\net4.7.2-windows\AdonisUI.dll ..\XrefViewer\Resources" />
+		<Exec Command="copy bin\Debug\net4.7.2-windows\AdonisUI.ClassicTheme.dll ..\XrefViewer\Resources" />
+		<Exec Command="copy bin\Debug\net4.7.2-windows\Newtonsoft.Json.dll ..\XrefViewer\Resources" />
+	</Target>
+	<Target Name="PostBuildRelease" AfterTargets="Build" Condition="'$(Configuration)'=='Release'">
+		<Exec Command="copy bin\Release\net4.7.2-windows\XrefViewerUI.exe ..\XrefViewer\Resources" />
+		<Exec Command="copy bin\Release\net4.7.2-windows\AdonisUI.dll ..\XrefViewer\Resources" />
+		<Exec Command="copy bin\Release\net4.7.2-windows\AdonisUI.ClassicTheme.dll ..\XrefViewer\Resources" />
+		<Exec Command="copy bin\Release\net4.7.2-windows\Newtonsoft.Json.dll ..\XrefViewer\Resources" />
+	</Target>
+</Project>

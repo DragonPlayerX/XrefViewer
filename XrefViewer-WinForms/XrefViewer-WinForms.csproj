@@ -1,25 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>net4.7.2</TargetFramework>
 		<LangVersion>Latest</LangVersion>
+		<UseWindowsForms>true</UseWindowsForms>
 		<AssemblyName Condition="'$(Configuration)'=='Debug'">XrefViewer-debug</AssemblyName>
 		<AssemblyName Condition="'$(Configuration)'=='Release'">XrefViewer</AssemblyName>
 	</PropertyGroup>
-
-	<ItemGroup>
-		<None Remove="Resources\AdonisUI.ClassicTheme.dll" />
-		<None Remove="Resources\AdonisUI.dll" />
-		<None Remove="Resources\Newtonsoft.Json.dll" />
-		<None Remove="Resources\XrefViewerUI.exe" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<EmbeddedResource Include="Resources\AdonisUI.ClassicTheme.dll" />
-		<EmbeddedResource Include="Resources\AdonisUI.dll" />
-		<EmbeddedResource Include="Resources\Newtonsoft.Json.dll" />
-		<EmbeddedResource Include="Resources\XrefViewerUI.exe" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<Reference Include="Il2Cppmscorlib">
@@ -40,6 +27,21 @@
 		<Reference Include="UnhollowerRuntimeLib">
 			<HintPath>..\Libs\UnhollowerRuntimeLib.dll</HintPath>
 		</Reference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Update="Properties\Resources.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Resources.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Update="Properties\Resources.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
 	</ItemGroup>
 
 </Project>

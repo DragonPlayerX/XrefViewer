@@ -1,0 +1,365 @@
+﻿<adonisControls:AdonisWindow x:Class="XrefViewerUI.MainWindow"
+                             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                             xmlns:local="clr-namespace:XrefViewerUI"
+                             xmlns:viewmodel="clr-namespace:XrefViewerUI.MVVM.ViewModel"
+                             xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
+                             xmlns:adonisControls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
+                             xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
+                             d:DataContext="{d:DesignInstance Type=viewmodel:MainViewModel}"
+                             mc:Ignorable="d"
+                             Height="750"
+                             Width="1200"
+                             Title="XrefViewerUI"
+                             WindowStartupLocation="CenterScreen">
+
+    <Window.DataContext>
+        <viewmodel:MainViewModel />
+    </Window.DataContext>
+
+    <Window.Style>
+        <Style TargetType="Window"
+               BasedOn="{StaticResource {x:Type Window}}" />
+    </Window.Style>
+
+    <Grid Background="{DynamicResource {x:Static adonisUi:Brushes.Layer0BackgroundBrush}}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="5" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="80" />
+                <RowDefinition Height="35" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0"
+                  Background="{DynamicResource {x:Static adonisUi:Brushes.Layer0BackgroundBrush}}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="0.15*" />
+                        <ColumnDefinition Width="0.5*" />
+                        <ColumnDefinition Width="0.2*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0"
+                            Content="Clear List"
+                            Margin="10"
+                            Height="30"
+                            Command="{Binding ClearListCommand}">
+
+                    </Button>
+                    <StackPanel Grid.Column="1"
+                                Orientation="Vertical">
+                        <TextBox adonisExtensions:WatermarkExtension.Watermark="Type..."
+                                 Text="{Binding TypeText, Mode=OneWayToSource}"
+                                 Height="30"
+                                 Margin="5,5,5,2.5" />
+                        <TextBox adonisExtensions:WatermarkExtension.Watermark="Method..."
+                                 Text="{Binding MethodText, Mode=OneWayToSource}"
+                                 Height="30"
+                                 Margin="5,2.5,5,5" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2"
+                                Orientation="Vertical"
+                                Margin="10">
+                        <CheckBox Content="Use exact name"
+                                  IsChecked="{Binding ExactNameState, Mode=OneWayToSource}"
+                                  Margin="10,0,0,0"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center" />
+                        <Button Grid.Column="1"
+                                Content="Run Scan"
+                                Margin="10"
+                                Height="30"
+                                Command="{Binding RunScanCommand}" />
+                    </StackPanel>
+
+                </Grid>
+            </Grid>
+
+            <TextBox Grid.Row="1"
+                     FontSize="20"
+                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                     adonisExtensions:WatermarkExtension.Watermark="Search...">
+            </TextBox>
+
+            <ListView Grid.Row="2"
+                      x:Name="XrefListView"
+                      ItemsSource="{Binding XrefObjects, UpdateSourceTrigger=PropertyChanged}"
+                      SelectedItem="{Binding SelectedObject}"
+                      ScrollViewer.CanContentScroll="False"
+                      ScrollViewer.VerticalScrollBarVisibility="Visible"
+                      ItemContainerStyle="{DynamicResource {x:Static adonisUi:Styles.RippleListBoxItem}}">
+                <ListView.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Remove"
+                                  Command="{Binding RemoveEntryCommand}"
+                                  CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.SelectedItem}" />
+                        <MenuItem Header="Scan Method"
+                                  Command="{Binding ScanMethodCommand}"
+                                  CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.SelectedItem}" />
+                        <MenuItem Header="Copy Name"
+                                  Command="{Binding CopyMethodNameCommand}"
+                                  CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.SelectedItem}" />
+                        <MenuItem Header="Export Method (JSON)"
+                                  Command="{Binding ExportMethodAsJsonCommand}"
+                                  CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.SelectedItem}" />
+                        <MenuItem Header="Export Method (Text)"
+                                  Command="{Binding ExportMethodAsTextCommand}"
+                                  CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.SelectedItem}" />
+                        <MenuItem Header="Export All Methods (JSON)"
+                                  Command="{Binding ExportListAsJsonCommand}"
+                                  CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.ItemsSource}" />
+                        <MenuItem Header="Export All Methods (Text)"
+                                  Command="{Binding ExportListAsTextCommand}"
+                                  CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.ItemsSource}" />
+                    </ContextMenu>
+                </ListView.ContextMenu>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding MethodType}"
+                                       Foreground="#bbbbbb"
+                                       FontSize="16"
+                                       VerticalAlignment="Center" />
+                            <TextBlock Text="#"
+                                       Foreground="White"
+                                       FontSize="16"
+                                       VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding Name}"
+                                       Foreground="Aqua"
+                                       FontSize="16"
+                                       VerticalAlignment="Center" />
+
+                            <StackPanel Orientation="Vertical">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Is Using: "
+                                               FontSize="14"
+                                               Margin="10, 0, 0, 0" />
+                                    <TextBlock Text="{Binding IsUsingCount, Mode=OneWay}"
+                                               FontSize="14" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Used By: "
+                                               FontSize="14"
+                                               Margin="10, 0, 0, 0" />
+                                    <TextBlock Text="{Binding UsedByCount, Mode=OneWay}"
+                                               FontSize="14" />
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
+
+        <GridSplitter Grid.Column="1"
+                      Width="5"
+                      Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1HighlightBrush}}" />
+
+        <GroupBox Grid.Column="2"
+                  Margin="0"
+                  adonisExtensions:LayerExtension.IncreaseLayer="True">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="110" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <GroupBox Grid.Row="0"
+                          VerticalAlignment="Top"
+                          Margin="10">
+                    <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="0,0,0,10">
+                            <TextBlock Text="{Binding SelectedObject.MethodType}"
+                                       Foreground="#bbbbbb"
+                                       FontSize="18"
+                                       VerticalAlignment="Center" />
+                            <TextBlock Text="#"
+                                       Foreground="White"
+                                       FontSize="18"
+                                       VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding SelectedObject.Name}"
+                                       Foreground="Aqua"
+                                       FontSize="18"
+                                       VerticalAlignment="Center" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="Scan"
+                                    FontSize="18"
+                                    Margin="0,0,10,0"
+                                    Command="{Binding ScanMethodCommand}"
+                                    CommandParameter="{Binding SelectedObject}" />
+                            <Button Content="Copy Name"
+                                    FontSize="18"
+                                    Margin="0"
+                                    Command="{Binding CopyMethodNameCommand}"
+                                    CommandParameter="{Binding SelectedObject}" />
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+
+                <Grid Grid.Row="1"
+                      Margin="10,0,10,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="50" />
+                        <RowDefinition />
+                        <RowDefinition Height="50" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+
+                    <DockPanel Grid.Row="0">
+                        <TextBlock Text="Method is using: "
+                                   FontSize="18"
+                                   Margin="10" />
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Right">
+                            <TextBlock Text="{Binding SelectedObject.ResolvedIsUsingCount}"
+                                       FontSize="18"
+                                       Margin="0,10,0,10" />
+                            <TextBlock Text="/"
+                                       FontSize="18"
+                                       Margin="0,10,0,10" />
+                            <TextBlock Text="{Binding SelectedObject.IsUsingCount}"
+                                       FontSize="18"
+                                       Margin="0,10,0,10" />
+                            <TextBlock Text=" resolved "
+                                       FontSize="18"
+                                       Margin="0,10,0,10" />
+                        </StackPanel>
+                    </DockPanel>
+
+                    <GroupBox Grid.Row="1"
+                              adonisExtensions:LayerExtension.IncreaseLayer="True">
+                        <ListView x:Name="XrefUsingListView"
+                                  ItemsSource="{Binding UsingXrefObjects, UpdateSourceTrigger=PropertyChanged}"
+                                  ScrollViewer.CanContentScroll="False"
+                                  ScrollViewer.VerticalScrollBarVisibility="Visible"
+                                  ItemContainerStyle="{DynamicResource {x:Static adonisUi:Styles.RippleListBoxItem}}">
+                            <ListView.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Scan Method"
+                                              Command="{Binding ScanMethodCommand}"
+                                              CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.SelectedItem}" />
+                                    <MenuItem Header="Copy Name"
+                                              Command="{Binding CopyMethodNameCommand}"
+                                              CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.SelectedItem}" />
+                                    <MenuItem Header="Copy Pointer"
+                                              Command="{Binding CopyMethodPointerCommand}"
+                                              CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.SelectedItem}" />
+                                </ContextMenu>
+                            </ListView.ContextMenu>
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Margin="0,5,0,5"
+                                                Orientation="Horizontal">
+                                        <TextBlock Text="String: "
+                                                   Foreground="#bbbbbb"
+                                                   FontSize="16"
+                                                   VerticalAlignment="Center"
+                                                   Visibility="{Binding StringVisibility, UpdateSourceTrigger=PropertyChanged}" />
+                                        <TextBlock Text="{Binding MethodType}"
+                                                   Foreground="#bbbbbb"
+                                                   FontSize="16"
+                                                   VerticalAlignment="Center"
+                                                   Visibility="{Binding TypeVisibility, UpdateSourceTrigger=PropertyChanged}" />
+                                        <TextBlock Text="#"
+                                                   Foreground="White"
+                                                   FontSize="16"
+                                                   VerticalAlignment="Center"
+                                                   Visibility="{Binding TypeVisibility, UpdateSourceTrigger=PropertyChanged}" />
+                                        <TextBlock Text="{Binding Name}"
+                                                   Foreground="Aqua"
+                                                   FontSize="16"
+                                                   VerticalAlignment="Center"
+                                                   Visibility="{Binding NameVisibility, UpdateSourceTrigger=PropertyChanged}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </GroupBox>
+
+                    <DockPanel Grid.Row="2">
+                        <TextBlock Text="Method is used by: "
+                                   FontSize="18"
+                                   Margin="10" />
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Right">
+                            <TextBlock Text="{Binding SelectedObject.ResolvedUsedByCount}"
+                                       FontSize="18"
+                                       Margin="0,10,0,10" />
+                            <TextBlock Text="/"
+                                       FontSize="18"
+                                       Margin="0,10,0,10" />
+                            <TextBlock Text="{Binding SelectedObject.UsedByCount}"
+                                       FontSize="18"
+                                       Margin="0,10,0,10" />
+                            <TextBlock Text=" resolved "
+                                       FontSize="18"
+                                       Margin="0,10,0,10" />
+                        </StackPanel>
+                    </DockPanel>
+
+                    <GroupBox Grid.Row="3"
+                              adonisExtensions:LayerExtension.IncreaseLayer="True">
+                        <ListView x:Name="XrefUsedByListView"
+                                  ItemsSource="{Binding UsedByXrefObjects, UpdateSourceTrigger=PropertyChanged}"
+                                  ScrollViewer.CanContentScroll="False"
+                                  ScrollViewer.VerticalScrollBarVisibility="Visible"
+                                  ItemContainerStyle="{DynamicResource {x:Static adonisUi:Styles.RippleListBoxItem}}">
+                            <ListView.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Scan Method"
+                                              Command="{Binding ScanMethodCommand}"
+                                              CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.SelectedItem}" />
+                                    <MenuItem Header="Copy Name"
+                                              Command="{Binding CopyMethodNameCommand}"
+                                              CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.SelectedItem}" />
+                                    <MenuItem Header="Copy Pointer"
+                                              Command="{Binding CopyMethodPointerCommand}"
+                                              CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.SelectedItem}" />
+                                </ContextMenu>
+                            </ListView.ContextMenu>
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Margin="0,5,0,5"
+                                                Orientation="Horizontal">
+                                        <TextBlock Text="String: "
+                                                   Foreground="#bbbbbb"
+                                                   FontSize="16"
+                                                   VerticalAlignment="Center"
+                                                   Visibility="{Binding StringVisibility, UpdateSourceTrigger=PropertyChanged}" />
+                                        <TextBlock Text="{Binding MethodType}"
+                                                   Foreground="#bbbbbb"
+                                                   FontSize="16"
+                                                   VerticalAlignment="Center"
+                                                   Visibility="{Binding TypeVisibility, UpdateSourceTrigger=PropertyChanged}" />
+                                        <TextBlock Text="#"
+                                                   Foreground="White"
+                                                   FontSize="16"
+                                                   VerticalAlignment="Center"
+                                                   Visibility="{Binding TypeVisibility, UpdateSourceTrigger=PropertyChanged}" />
+                                        <TextBlock Text="{Binding Name}"
+                                                   Foreground="Aqua"
+                                                   FontSize="16"
+                                                   VerticalAlignment="Center"
+                                                   Visibility="{Binding NameVisibility, UpdateSourceTrigger=PropertyChanged}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </GroupBox>
+
+                </Grid>
+            </Grid>
+        </GroupBox>
+    </Grid>
+</adonisControls:AdonisWindow>

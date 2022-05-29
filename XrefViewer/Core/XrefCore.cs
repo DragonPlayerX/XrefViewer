@@ -1,26 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Reflection;
-using System.Windows.Forms;
 using UnhollowerRuntimeLib.XrefScans;
+
+using XrefViewer.Core.Network;
 
 namespace XrefViewer.Core
 {
     public static class XrefCore
     {
-        private static XrefViewerWindow Window => XrefViewerMod.Instance.ViewerWindow;
-
         private static readonly List<Type> BlacklistedTypes = new List<Type>() { typeof(Il2CppSystem.Object), typeof(object) };
 
-        public static void Scan(string typeName, string methodName, bool printStrings, bool exactName, bool largeScans)
+        public static string Scan(string typeName, string methodName, bool exactName, ref List<XrefObject> xrefResult)
         {
-            if (typeName == null)
-            {
-                Window.WriteLine(Color.Red, "ERROR: No type defined");
-                return;
-            }
+            if (string.IsNullOrEmpty(typeName) || string.IsNullOrWhiteSpace(typeName))
+                return "No type defined";
 
             Type type = null;
             foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
@@ -34,16 +29,13 @@ namespace XrefViewer.Core
             }
 
             if (type == null)
-            {
-                Window.WriteLine(Color.Red, "ERROR: Type not found");
-                return;
-            }
+                return "Type not found";
 
             if (methodName != null)
             {
                 if (exactName)
                 {
-                    DumpMethod(type.GetMethod(methodName), printStrings, largeScans);
+                    ScanMethod(type.GetMethod(methodName), ref xrefResult);
                 }
                 else
                 {
@@ -56,17 +48,17 @@ namespace XrefViewer.Core
                         {
                             if (method.Name.Contains(methodName))
                             {
-                                DumpMethod(method, printStrings, largeScans);
+                                ScanMethod(method, ref xrefResult);
                                 foundMethod = true;
                             }
                         }
 
                         if (!foundMethod)
-                            Window.WriteLine(Color.Red, "ERROR: Method not found");
+                            return "Method not found";
                     }
                     catch (Exception e)
                     {
-                        Window.WriteLine(Color.Red, "An error occurred: " + e.ToString());
+                        return "An error occurred: " + e.ToString();
                     }
                 }
             }
@@ -79,99 +71,80 @@ namespace XrefViewer.Core
                     foreach (MethodInfo method in methods)
                     {
                         if (!BlacklistedTypes.Contains(method.DeclaringType))
-                            DumpMethod(method, printStrings, largeScans);
+                            ScanMethod(method, ref xrefResult);
                     }
                 }
                 catch (Exception e)
                 {
-                    Window.WriteLine(Color.Red, "An error occurred: " + e.ToString());
+                    return "An error occurred: " + e.ToString();
                 }
             }
+
+            return null;
         }
 
-        private static void DumpMethod(MethodInfo method, bool printStrings, bool largeScans)
+        private static string ScanMethod(MethodInfo method, ref List<XrefObject> xrefResult)
         {
             try
             {
                 if (method == null)
-                {
-                    Window.WriteLine(Color.Red, "ERROR: Method not found");
-                    return;
-                }
+                    return "Method not found";
 
-                Window.Write(Color.Yellow, "Scanning ");
-                Window.Write(Color.DarkGray, method.DeclaringType.FullName + "#");
-                Window.Write(Color.Aqua, method.Name);
-                Window.Write(Color.Yellow, " =>\n");
+                XrefObject xrefObject = new XrefObject();
+                xrefObject.Type = XrefObject.XrefType.Method;
+                xrefObject.Name = method.Name;
+                xrefObject.MethodType = method.DeclaringType.FullName;
+                xrefObject.Pointer = 0;
 
-                if (printStrings)
-                {
-                    Window.WriteLine(Color.LightGreen, "Method strings: ");
-                    XrefInstance[] result = XrefScanner.XrefScan(method).ToArray();
-                    if (result.Length > 100 && !largeScans)
-                        Window.WriteLine(Color.Yellow, "Unable to dump information because it exceeded the length limit. Bypass with adding -l argument.");
-                    else
-                        DumpXrefMethodString(result);
-                }
-                else
-                {
-                    Window.WriteLine(Color.LightGreen, "Method is using: ");
-                    XrefInstance[] usingResult = XrefScanner.XrefScan(method).ToArray();
-                    if (usingResult.Length > 100 && !largeScans)
-                        Window.WriteLine(Color.Yellow, "Unable to dump information because it exceeded the length limit. Bypass with adding -l argument.");
-                    else
-                        DumpXrefMethod(usingResult);
+                XrefInstance[] usingResult = XrefScanner.XrefScan(method).ToArray();
+                if (usingResult.Length < 512)
+                    xrefObject.IsUsing.AddRange(ScanXrefInstances(usingResult));
 
-                    Window.WriteLine(Color.LightGreen, "Method is used by:");
-                    XrefInstance[] usedByResult = XrefScanner.UsedBy(method).ToArray();
-                    if (usedByResult.Length > 100 && !largeScans)
-                        Window.WriteLine(Color.Yellow, "Unable to dump information because it exceeded the length limit. Bypass with adding -l argument.");
-                    else
-                        DumpXrefMethod(usedByResult);
-                }
+                XrefInstance[] usedByResult = XrefScanner.UsedBy(method).ToArray();
+                if (usedByResult.Length < 512)
+                    xrefObject.UsedBy.AddRange(ScanXrefInstances(usedByResult));
+
+                xrefResult.Add(xrefObject);
             }
             catch (Exception)
             {
-                Window.WriteLine(Color.Red, "ERROR: Method cannot be scanned");
+                return "Unable to scan method";
             }
+
+            return null;
         }
 
-        private static void DumpXrefMethodString(IEnumerable<XrefInstance> instances)
+        private static List<XrefObject> ScanXrefInstances(IEnumerable<XrefInstance> instances)
         {
-            foreach (XrefInstance instance in instances)
-            {
-                if (instance.Type == XrefType.Global)
-                    Window.WriteLine(Color.White, "String: " + instance.ReadAsObject().ToString());
-                Application.DoEvents();
-            }
-        }
+            List<XrefObject> xrefResult = new List<XrefObject>(); ;
 
-        private static void DumpXrefMethod(IEnumerable<XrefInstance> instances)
-        {
-            int methods = 0;
-            int resolvedMethods = 0;
             foreach (XrefInstance instance in instances)
             {
+                XrefObject xrefObject = new XrefObject();
+                xrefObject.Type = XrefObject.XrefType.Unresolved;
+
                 if (instance.Type == XrefType.Global)
                 {
-                    Window.WriteLine(Color.White, "String: " + instance.ReadAsObject().ToString() + "\n");
+                    xrefObject.Name = instance.ReadAsObject().ToString();
+                    xrefObject.Type = XrefObject.XrefType.String;
+                    xrefObject.Pointer = instance.Pointer.ToInt64();
                 }
                 else
                 {
                     MethodBase resolvedMethod = instance.TryResolve();
                     if (resolvedMethod != null)
                     {
-                        Window.WriteLine(Color.White, "Type: " + resolvedMethod.DeclaringType.FullName + "\n" +
-                            "Method: " + resolvedMethod.Name + "\n");
-
-                        resolvedMethods++;
+                        xrefObject.Name = resolvedMethod.Name;
+                        xrefObject.MethodType = resolvedMethod.DeclaringType.FullName;
+                        xrefObject.Type = XrefObject.XrefType.Method;
+                        xrefObject.Pointer = instance.Pointer.ToInt64();
                     }
                 }
-                methods++;
-                Application.DoEvents();
+
+                xrefResult.Add(xrefObject);
             }
 
-            Window.WriteLine(Color.LightBlue, methods + " methods, " + resolvedMethods + " resolved methods\n");
+            return xrefResult;
         }
     }
 }
