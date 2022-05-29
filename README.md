@@ -2,19 +2,25 @@
 
 ## Requirements
 
-- [MelonLoader 0.4.x](https://melonwiki.xyz/)
+- [MelonLoader 0.5.4+](https://melonwiki.xyz/)
 
 ## Description
 
-This mod utilizes the Xref scanning methods from [Il2CppAssemblyUnhollower](https://github.com/knah/Il2CppAssemblyUnhollower) and provides user input based scans at runtime controlled by a simple functional WinForms window.
+The project is now based on a mod which extracts a WPF (.NET 4.7.2) application on startup and transfers data via tcp sockets between processes. WPF performs much faster and better than WinForms running inside a mod.
 
-## Features
+This mod utilizes xref scanning methods from [Il2CppAssemblyUnhollower](https://github.com/knah/Il2CppAssemblyUnhollower) and provides user input based scans at runtime controlled by a external WPF application. It can be very helpful for modders to find methods via xref scanning to have persistence against game updates.
 
-- Scan a method for **UsedBy** and **Using** (also prints strings)
-- Print only strings from containing methods
-- Scan all methods from a given type
+## Example Video
 
----
+
+## Credits
+
+The repository includes files of the following packages used for the WPF application:
+
+- [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json) (Covered by [MIT  license](https://github.com/JamesNK/Newtonsoft.Json/blob/master/LICENSE.md))
+- [AdonisUI](https://github.com/benruehl/adonis-ui) (Covered by [MIT  license](https://github.com/benruehl/adonis-ui/blob/master/LICENSE))
+
+# WinForms Version (Deprecated)
 
 ## Usage
 
