@@ -1,11 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>net4.7.2</TargetFramework>
 		<LangVersion>Latest</LangVersion>
 		<UseWindowsForms>true</UseWindowsForms>
-		<AssemblyName Condition="'$(Configuration)'=='Debug'">XrefViewer-debug</AssemblyName>
-		<AssemblyName Condition="'$(Configuration)'=='Release'">XrefViewer</AssemblyName>
+		<AssemblyName Condition="'$(Configuration)'=='Debug'">XrefViewer-WinForms-debug</AssemblyName>
+		<AssemblyName Condition="'$(Configuration)'=='Release'">XrefViewer-WinForms</AssemblyName>
 	</PropertyGroup>
 
 	<ItemGroup>
