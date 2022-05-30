@@ -105,6 +105,9 @@
                         <MenuItem Header="Scan Method"
                                   Command="{Binding ScanMethodCommand}"
                                   CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.SelectedItem}" />
+                        <MenuItem Header="Scan Type"
+                                  Command="{Binding ScanTypeCommand}"
+                                  CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.SelectedItem}" />
                         <MenuItem Header="Copy Name"
                                   Command="{Binding CopyMethodNameCommand}"
                                   CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.SelectedItem}" />
@@ -249,6 +252,9 @@
                                     <MenuItem Header="Scan Method"
                                               Command="{Binding ScanMethodCommand}"
                                               CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.SelectedItem}" />
+                                    <MenuItem Header="Scan Type"
+                                              Command="{Binding ScanTypeCommand}"
+                                              CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.SelectedItem}" />
                                     <MenuItem Header="Copy Name"
                                               Command="{Binding CopyMethodNameCommand}"
                                               CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.SelectedItem}" />
@@ -319,6 +325,9 @@
                                 <ContextMenu>
                                     <MenuItem Header="Scan Method"
                                               Command="{Binding ScanMethodCommand}"
+                                              CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.SelectedItem}" />
+                                    <MenuItem Header="Scan Type"
+                                              Command="{Binding ScanTypeCommand}"
                                               CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.SelectedItem}" />
                                     <MenuItem Header="Copy Name"
                                               Command="{Binding CopyMethodNameCommand}"
